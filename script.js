@@ -4,13 +4,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleModeButton = document.getElementById('toggleMode');
     const body = document.body;
   
-    let frutas = [];
-    let editIndex = -1;
+    const apiURL = 'http://localhost:5000/api/frutas';
+  
+    let editIndex = null;
   
     // Obtener y mostrar las frutas
-    const mostrarFrutas = () => {
+    const obtenerFrutas = async () => {
+      const response = await fetch(apiURL);
+      const frutas = await response.json();
       frutasContainer.innerHTML = '';
-      frutas.forEach((fruta, index) => {
+      frutas.forEach((fruta) => {
         const frutaDiv = document.createElement('div');
         frutaDiv.classList.add('fruta');
         const imgElement = document.createElement('img');
@@ -23,8 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
         frutaDiv.innerHTML = `
           <h3>${fruta.nombre}</h3>
           <p>$${fruta.precio}</p>
-          <button onclick="editarFruta(${index})">Editar</button>
-          <button onclick="eliminarFruta(${index})">Eliminar</button>
+          <button onclick="editarFruta('${fruta._id}')">Editar</button>
+          <button onclick="eliminarFruta('${fruta._id}')">Eliminar</button>
         `;
         frutaDiv.insertBefore(imgElement, frutaDiv.firstChild);
         frutasContainer.appendChild(frutaDiv);
@@ -32,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   
     // Crear o actualizar fruta
-    frutaForm.addEventListener('submit', (e) => {
+    frutaForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const nombre = document.getElementById('nombre').value;
       const precio = document.getElementById('precio').value;
@@ -40,33 +43,48 @@ document.addEventListener('DOMContentLoaded', () => {
   
       const frutaData = { nombre, precio, imagen };
   
-      if (editIndex === -1) {
+      if (editIndex === null) {
         // Crear nueva fruta
-        frutas.push(frutaData);
+        await fetch(apiURL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(frutaData),
+        });
       } else {
         // Actualizar fruta
-        frutas[editIndex] = frutaData;
-        editIndex = -1;
+        await fetch(`${apiURL}/${editIndex}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(frutaData),
+        });
+        editIndex = null;
       }
   
       frutaForm.reset();
-      mostrarFrutas();
+      obtenerFrutas();
     });
   
     // Editar fruta
-    window.editarFruta = (index) => {
-      const fruta = frutas[index];
-      document.getElementById('frutaId').value = index;
+    window.editarFruta = async (id) => {
+      const response = await fetch(`${apiURL}/${id}`);
+      const fruta = await response.json();
+      document.getElementById('frutaId').value = id;
       document.getElementById('nombre').value = fruta.nombre;
       document.getElementById('precio').value = fruta.precio;
       document.getElementById('imagen').value = fruta.imagen;
-      editIndex = index;
+      editIndex = id;
     };
   
     // Eliminar fruta
-    window.eliminarFruta = (index) => {
-      frutas.splice(index, 1);
-      mostrarFrutas();
+    window.eliminarFruta = async (id) => {
+      await fetch(`${apiURL}/${id}`, {
+        method: 'DELETE',
+      });
+      obtenerFrutas();
     };
   
     // Alternar modo claro/oscuro
@@ -82,6 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   
-    mostrarFrutas();
+    obtenerFrutas();
   });
   
