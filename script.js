@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const frutaForm = document.getElementById('frutaForm');
     const frutasContainer = document.getElementById('frutasContainer');
+    const toggleModeButton = document.getElementById('toggleMode');
+    const body = document.body;
   
     let frutas = [];
     let editIndex = -1;
@@ -11,13 +13,20 @@ document.addEventListener('DOMContentLoaded', () => {
       frutas.forEach((fruta, index) => {
         const frutaDiv = document.createElement('div');
         frutaDiv.classList.add('fruta');
+        const imgElement = document.createElement('img');
+        imgElement.src = fruta.imagen;
+        imgElement.alt = fruta.nombre;
+        imgElement.onerror = () => {
+          imgElement.src = 'https://via.placeholder.com/600x400';  // Imagen por defecto
+          console.error(`Error al cargar la imagen de ${fruta.nombre}`);
+        };
         frutaDiv.innerHTML = `
-          <img src="${fruta.imagen}" alt="${fruta.nombre}">
           <h3>${fruta.nombre}</h3>
           <p>$${fruta.precio}</p>
           <button onclick="editarFruta(${index})">Editar</button>
           <button onclick="eliminarFruta(${index})">Eliminar</button>
         `;
+        frutaDiv.insertBefore(imgElement, frutaDiv.firstChild);
         frutasContainer.appendChild(frutaDiv);
       });
     };
@@ -59,6 +68,19 @@ document.addEventListener('DOMContentLoaded', () => {
       frutas.splice(index, 1);
       mostrarFrutas();
     };
+  
+    // Alternar modo claro/oscuro
+    toggleModeButton.addEventListener('click', () => {
+      if (body.classList.contains('light-mode')) {
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+        toggleModeButton.textContent = 'Modo Claro';
+      } else {
+        body.classList.remove('dark-mode');
+        body.classList.add('light-mode');
+        toggleModeButton.textContent = 'Modo Oscuro';
+      }
+    });
   
     mostrarFrutas();
   });

@@ -5,16 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CRUD Frutas</title>
   <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="light-mode">
   <div class="container">
-    <h1>CRUD Frutas</h1>
+    <header>
+      <h1>CRUD Frutas</h1>
+      <button id="toggleMode">Modo Oscuro</button>
+    </header>
     <div class="form-container">
       <form id="frutaForm">
         <input type="hidden" id="frutaId">
         <input type="text" id="nombre" placeholder="Nombre de la fruta" required>
         <input type="number" id="precio" placeholder="Precio" required>
-        <input type="text" id="imagen" placeholder="URL de la imagen" required>
+        <input type="url" id="imagen" placeholder="URL de la imagen" required>
         <button type="submit">Guardar</button>
       </form>
     </div>
@@ -23,3 +27,4 @@
   <script src="script.js"></script>
 </body>
 </html>
+
